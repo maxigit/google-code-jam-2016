@@ -17,18 +17,18 @@ main = do
 
 
 solve f i = do 
-  putStr$ "Case #" ++ show i ++ "# "
+  putStr$ "Case #" ++ show i ++ ": "
 
   n <- read <$> getLine
-  putStrLn $ show (n :: Int)
+  putStrLn (f n)
 
 
 f :: Int -> String
 f n = go n (Set.empty) 1 where
-  go _ _ 10 = "INSOMNIA"
-  go n done i | length (Set.toList done) == 10 = show $ i-1
-  go n done i = let numbers = show (n*i)
-     in go n (done <> Set.fromList numbers) (i+1)
+  -- go _ _ 10 = "INSOMNIA"
+go n done i | length (Set.toList done) == 10 = show $ i-1
+go n done i = let numbers = show (n*i)
+  in go n (done <> Set.fromList numbers) (i+1)
   
 
 
