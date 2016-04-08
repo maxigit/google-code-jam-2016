@@ -24,11 +24,13 @@ solve f i = do
 
 
 f :: Int -> String
-f n = go n (Set.empty) 1 where
-  -- go _ _ 10 = "INSOMNIA"
-go n done i | length (Set.toList done) == 10 = show $ i-1
-go n done i = let numbers = show (n*i)
-  in go n (done <> Set.fromList numbers) (i+1)
+f n = go n (Set.empty) 0 where
+go 0 _ _ = "INSOMNIA"
+go n done n' | length (Set.toList done) == 10 = show $ n'
+go n done n' = let numbers = show (n'')
+                   n'' = n + n'
+  in go n (done <> Set.fromList numbers) (n'')
+  
   
 
 
