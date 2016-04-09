@@ -1,2 +1,3 @@
 solve:
-	cabal run < input.txt
+	cabal run < input.txt | tee output.txt
+
