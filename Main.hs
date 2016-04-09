@@ -19,17 +19,36 @@ main = do
 solve f i = do 
   putStr$ "Case #" ++ show i ++ ": "
 
-  n <- read <$> getLine
-  putStrLn (f n)
+  pancakes <- getLine
+  putStrLn $ show (f pancakes)
 
 
-f :: Int -> String
-f n = go n (Set.empty) 0 where
-go 0 _ _ = "INSOMNIA"
-go n done n' | length (Set.toList done) == 10 = show $ n'
-go n done n' = let numbers = show (n'')
-                   n'' = n + n'
-  in go n (done <> Set.fromList numbers) (n'')
+-- we can ignore the  happy pancackes at the bottom
+f p = go  (reverse p) 0
+go [] n = n
+go ('+':ps) n  = go ps n
+-- if we have unhappy on the top we flip everything
+go ps n = case split ps of
+    (bot, mid, []) -> go (turn (bot ++ mid)) (n+1)
+    (bot, mid, top) ->  go (bot ++ turn (mid ++ top)) (n+1)
+
+
+inverse '+' = '-'
+inverse '-' = '+'
+
+turn = reverse . map inverse
+
+-- split a pile in unhappy at the bottom and happy at the top
+split :: [Char] -> ([Char], [Char], [Char])
+split [] = ([], [], [])
+split ('-':ps) = let (bot, mid, head) = split ps
+  in ('-':bot, mid, head)
+
+-- find the bottom, 
+split  (p:ps) = case split (turn ps) of  
+   (bot', [], []) -> ([], [],  p : turn bot')
+   (bot', mid', head') -> ([], p :  turn (head' ++ mid'), turn bot')
+     
   
   
 
