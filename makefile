@@ -1,3 +1,3 @@
 solve:
-	cabal run < input.txt | tee output.txt
+	dist/build/jam/jam < input.txt | tee output.txt
 
