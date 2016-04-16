@@ -26,12 +26,29 @@ solve f i = do
   let types = bff :: [Int]
 
   let m = toMap bff
-  print m
   let pathMap = map (pathFrom m) [1 ..length bff]
+
+
   print pathMap
+  print $ f pathMap
 
 
-f = undefined
+f p = max cycles fromChain where
+ loops = filter isLoop p
+ cycles = maximum' (map pathLength loops)
+ chains = Map.toList $ Map.fromListWith (<>) [(head l, [path] ) | path <- p, let l = pa path, isPair path]
+ fromChain = sum' (map max2 chains) - length chains -- to count pair only once
+
+sum' [] = 0
+sum' xs = sum xs
+maximum' [] = 0
+maximum' xs = maximum xs
+-- get the two longuest chains with nothing common
+max2 (_, []) = 0
+max2 (_, cs) = maximum $ map pathLength cs 
+ 
+
+
 
 data Path
   = Pair [Int]
@@ -39,6 +56,20 @@ data Path
   | ToPair [Int] -- ex 1 2 3 2
   | ToLoop [Int] 
   deriving Show
+pathLength (Pair ps ) = length ps - 1
+pathLength (ToPair ps ) = length ps - 1
+pathLength (ToLoop ps ) = length ps - 1
+pathLength (Loop ps ) = length ps - 1
+pa (Pair ps ) = ps
+pa (ToPair ps ) = ps
+pa (ToLoop ps ) = ps
+pa (Loop ps ) = ps
+isLoop (Loop _) = True
+isLoop _ = False
+
+isPair (Pair ps) = True
+isPair (ToPair ps) = True
+isPair _ = False
 
 toMap :: [Int] -> Map Int Int
 toMap xs = Map.fromList $ zip [1..] xs
