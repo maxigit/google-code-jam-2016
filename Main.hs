@@ -20,30 +20,42 @@ main = do
 
 solve f i = do 
   putStr$ "Case #" ++ show i ++ ": "
-  [k, c, s] <- map read . words <$> getLine
+  getLine
+  bff <- map read . words <$> getLine
 
-  f k c s
+  let types = bff :: [Int]
 
--- a column is represented as fractal coordinate
---in each index correspond to one generation
---ex 1.2.3 for fist
-f :: Int -> Int -> Int -> IO ()
-f k c s = do
-  -- we compute for each column which initial gold tiles it's supposed to check
-  -- each columns can check c initial gold tile at the same time
-  -- we need to check k columns and group the indexes by k
-  let indexes = chunksOf c [0..(k-1)]
-
-  if (length indexes) > s
-  then putStrLn "IMPOSSIBLE"
-  else  do -- we need to convert list of index to a column
-     let cols = map (show . toColumn k c) indexes
-     -- let cols = map (show  ) indexes
-     mapM_ putStr (intersperse " " cols)
-     putStrLn ""
+  let m = toMap bff
+  print m
+  let pathMap = map (pathFrom m) [1 ..length bff]
+  print pathMap
 
 
-toColumn :: Int -> Int -> [Int] -> Int
-toColumn k c is = let 
-  weights = map (k^) [c-1,c-2..0]
-  in 1 + (sum $ zipWith (*) is weights)
+f = undefined
+
+data Path
+  = Pair [Int]
+  | Loop [Int] -- ex 1 2 3 1
+  | ToPair [Int] -- ex 1 2 3 2
+  | ToLoop [Int] 
+  deriving Show
+
+toMap :: [Int] -> Map Int Int
+toMap xs = Map.fromList $ zip [1..] xs
+  
+
+          
+next m i = fromJust $ Map.lookup i m
+-- computes the path starting from the given point
+path m i0 (vs) prev i | i `elem` vs = (i0, (i:vs), prev, i)
+                 | otherwise = path m i0 (i:vs) i (next m i)
+
+
+pathFrom m i = let 
+  (start, visited, ante, end) = path m i [] i i
+  in case visited of
+	    [a,b,c] | a == c  -> Pair visited
+	    (a:b:c:_) | a == c  -> ToPair visited
+	    _ | start == end -> Loop visited
+	    _ -> ToLoop visited
+  
