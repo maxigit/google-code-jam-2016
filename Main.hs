@@ -29,7 +29,7 @@ solve f i = do
   let pathMap = map (pathFrom m) [1 ..length bff]
 
 
-  print pathMap
+  -- print pathMap
   print $ f pathMap
 
 
